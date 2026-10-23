@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumière — Filmes</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <path d="M7 3v18M3 7.5h4M3 12h18M3 16.5h4M17 3v18M17 7.5h4M17 16.5h4"></path>
+            </svg>
+            <span>Lumière</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <section aria-labelledby="search-title">
+            <h1 id="search-title">Encontre seu próximo filme</h1>
+            <p class="muted">Busque um título para consultar até 10 filmes na OMDb.</p>
+
+            <form method="get" action="{% url 'home' %}" class="search-form">
+                <label for="movie-query">Título do filme</label>
+                <div class="search-controls">
+                    <input id="movie-query" type="search" name="q" value="{{ query }}" placeholder="Ex.: Batman" maxlength="100" required>
+                    <button type="submit">Buscar filmes</button>
+                </div>
+            </form>
+
+            {% if api_error %}
+                <p class="notice notice-error" role="alert">{{ api_error }}</p>
+            {% endif %}
+
+            <h2>Resultados para “{{ query }}”</h2>
+            <div class="catalog">
+                {% for movie in api_movies %}
+                    <article class="card movie-card">
+                        <div class="poster-frame">
+                            {% if movie.Poster and movie.Poster != "N/A" %}
+                                <img src="{{ movie.Poster }}" alt="Pôster de {{ movie.Title }}" width="300" height="450" loading="lazy" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+                                <div class="poster-placeholder" hidden>Pôster indisponível</div>
+                            {% else %}
+                                <div class="poster-placeholder">Pôster indisponível</div>
+                            {% endif %}
+                        </div>
+                        <div class="card-content">
+                            <h3>{{ movie.Title|default:"Título não informado" }}</h3>
+                            <p class="movie-year">{{ movie.Year|default:"Ano não informado" }}</p>
+                            {% if movie.imdbID %}
+                                <a class="imdb-link" href="https://www.imdb.com/title/{{ movie.imdbID }}/" aria-label="Ver {{ movie.Title }} no IMDb">Ver no IMDb</a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% empty %}
+                    {% if not api_error %}
+                        <p class="empty-message">Nenhum filme encontrado. Tente outro título.</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="local-section" aria-labelledby="saved-title">
+            <h2 id="saved-title">Meus filmes cadastrados</h2>
+            <p class="muted">Filmes que você adicionou pelo formulário abaixo.</p>
+            <div class="saved-catalog">
+                {% for movie in movies %}
+                    <article class="card saved-card">
+                        <h3>{{ movie.title }}</h3>
+                        <p>{{ movie.director }} · {{ movie.release_year }}</p>
+                        <form method="post" action="{% url 'delete_movie' movie.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="button-delete" aria-label="Apagar {{ movie.title }} dos filmes cadastrados">Apagar filme</button>
+                        </form>
+                    </article>
+                {% empty %}
+                    <p class="empty-message">Você ainda não cadastrou nenhum filme.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="add-section" aria-labelledby="add-title">
+            <h2 id="add-title">Adicionar novo filme</h2>
+            <form method="post" class="movie-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Adicionar filme</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
