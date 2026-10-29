@@ -65,20 +65,59 @@
 
         <section class="local-section" aria-labelledby="saved-title">
             <h2 id="saved-title">Meus filmes cadastrados</h2>
-            <p class="muted">Filmes que você adicionou pelo formulário abaixo.</p>
+        
+            <p class="muted">
+                Filmes que você adicionou pelo formulário abaixo.
+            </p>
+        
             <div class="saved-catalog">
+        
                 {% for movie in movies %}
+        
                     <article class="card saved-card">
-                        <h3>{{ movie.title }}</h3>
-                        <p>{{ movie.director }} · {{ movie.release_year }}</p>
-                        <form method="post" action="{% url 'delete_movie' movie.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="button-delete" aria-label="Apagar {{ movie.title }} dos filmes cadastrados">Apagar filme</button>
-                        </form>
+        
+                        <p>
+                            {{ movie.director }} ·
+                            {{ movie.genre }} ·
+                            {{ movie.release_date|date:"d/m/Y" }}
+                        </p>
+        
+                        <div class="movie-actions">
+        
+                            <a
+                                href="{% url 'update_movie' movie.id %}"
+                                class="button-edit"
+                            >
+                                Editar filme
+                            </a>
+        
+                            <form
+                                method="post"
+                                action="{% url 'delete_movie' movie.id %}"
+                            >
+                                {% csrf_token %}
+        
+                                <button
+                                    type="submit"
+                                    class="button-delete"
+                                >
+                                    Apagar filme
+                                </button>
+        
+                            </form>
+        
+                        </div>
+        
                     </article>
+        
                 {% empty %}
-                    <p class="empty-message">Você ainda não cadastrou nenhum filme.</p>
+        
+                    <p class="empty-message">
+                        Você ainda não cadastrou nenhum filme.
+                    </p>
+        
                 {% endfor %}
+        
             </div>
         </section>
 

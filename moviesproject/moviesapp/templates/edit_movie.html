@@ -1,0 +1,60 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar Filme</title>
+
+<link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <span>Lumière</span>
+        </div>
+    </header>
+
+    <main class="edit-container">
+
+        <div class="edit-card">
+
+            <h1>Editar Filme</h1>
+
+            <p class="edit-subtitle">
+                Altere as informações de
+                <strong>{{ movie.title }}</strong>
+            </p>
+
+            <form method="post" class="edit-form">
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <div class="edit-actions">
+
+                    <button type="submit">
+                        Salvar alterações
+                    </button>
+
+                    <a href="{% url 'home' %}" class="button-back">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

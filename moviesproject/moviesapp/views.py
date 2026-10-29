@@ -2,6 +2,7 @@ import os
 
 import requests
 from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404
 
 from .forms import MovieForm
 from .models import Movie
@@ -17,7 +18,7 @@ def home(request):
         form = MovieForm()
 
     query = request.GET.get("q", "").strip() or "Batman"
-    api_key = "38b4b85b"
+    api_key = os.getenv("OMDB_API_KEY", "").strip() #troquei pra não jogar a api no github
     api_movies = []
     api_error = ""
 
@@ -46,6 +47,28 @@ def home(request):
         "query": query,
         "movies": Movie.objects.order_by("id"),
         "form": form,
+    })
+
+def update_movie(request, movie_id):
+
+    movie = get_object_or_404(Movie, id=movie_id)
+
+    if request.method == "POST":
+        form = MovieForm(request.POST, instance=movie)
+
+        if form.is_valid():
+            form.save()
+            return redirect("home")
+
+    else:
+        form = MovieForm(instance=movie)
+
+    return render(
+        request,
+        "edit_movie.html",
+        {
+            "form": form,
+            "movie": movie
     })
 
 

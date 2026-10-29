@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('home/<int:movie_id>', delete_movie, name='delete_movie'),
+    path('movie/<int:movie_id>/edit/',update_movie,name='update_movie'),
 ]
